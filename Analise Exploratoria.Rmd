@@ -1,0 +1,139 @@
+---
+title: "Analise Exploratoria"
+author: "Lucas Terciotti"
+output: html_document
+---
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(rpart)
+library(rpart.plot)
+library(RColorBrewer)
+library(rattle)
+library(Amelia)
+```
+
+Para inciar a análise, retiraram-se os dados do repositório no GitHub:
+
+```{r}
+titanic <- read.csv(("https://raw.githubusercontent.com/Efsilvaa/EPSMLRepo/master/Data/titanic.csv"),
+                    stringsAsFactors=FALSE,
+                    na.strings = c(""))
+str(titanic)
+```
+#Preparação dos dados:
+A intenção inicial é ocupar os dados ausentes de colunas relevantes com informações úteis para a análise e colocar as variáveis categoricas como fatores.
+
+```{r}
+missmap(titanic, main = "Missing values vs observed")
+```
+
+
+Primeiramente, alterou-se a coluna Survived para fator, para facilitar a avaliação das informações contidas nessa variável:
+```{r}
+titanic$Survived <- as.factor(titanic$Survived)
+summary(titanic$Survived)
+```
+Depois, a coluna Embarked também foi transformada e seus espaços desconhecidos preenchidos com "S". Foi decidido por tomar essa decisão, pois eram pouquíssimos valores ausentes e "S" o fator mais comum na avaliação.
+```{r}
+titanic$Embarked <- as.factor(titanic$Embarked)
+titanic$Embarked[is.na(titanic$Embarked)] = "S"
+titanic$Embarked <- factor(titanic$Embarked)
+summary(titanic$Embarked)
+```
+Sexo tmabém apresenta-se como uma variável categorica, entretanto é classificada no resumo dos dados como caracter.
+```{r}
+titanic$Sex <- as.factor(titanic$Sex)
+contrasts(titanic$Sex)
+```
+Após a aula de random forest, os dados ausentes referentes à idade foram preenchidos com uma previsão, que pode ser vista a seguir:
+```{r}
+Agefit <- rpart(Age ~ Pclass + Sex + SibSp +
+                  Parch + Fare + Embarked,
+                data=titanic[!is.na(titanic$Age),], 
+                method="anova")
+
+titanic$Age[is.na(titanic$Age)] <-
+  
+  predict(Agefit, titanic[is.na(titanic$Age),])
+
+summary(titanic$Age)
+```
+Como podemos analisar, os dados foram devidamente preenchidos (excluindo-se a coluna referente à cabine):
+```{r}
+missmap(titanic, main = "Missing values vs observed")
+```
+
+#Análise dos dados:
+###Curiosidade:
+Quais os sobreviventes de 30 anos?
+```{r}
+filter(titanic, Survived == 1, Age == 30) #permite filtrar os dados para alcançar informações específicas
+```
+###Curiosidade:
+Qual a média de idade dos que morreram? e dos que sobreviveram?
+```{r}
+Alive <- group_by(titanic, Survived)
+summarise(Alive, Age = mean(Age, na.rm = TRUE))
+```
+###Métricas básicas: 
+Six number summary
+
+```{r}
+summary(titanic)
+```
+
+###Boxplot:
+```{r}
+ggplot(data = titanic, aes(x = "", y = Age) ) + 
+  geom_boxplot() +
+  geom_jitter()
+
+ggplot(data = titanic, aes(x=Sex, y=Age)) + 
+  geom_boxplot(aes(color=Survived))
+
+ggplot(data = titanic, aes(x=Survived, y=Age)) + 
+  geom_boxplot(aes(color= Embarked))
+```
+
+###scatterplot (Age ~Survived)
+```{r}
+ggplot(data = titanic) + 
+  geom_point(mapping = aes(x = Age, y = Survived))
+```
+
+###scatterplot (Age ~Embarked)
+```{r}
+ggplot(data = titanic) + 
+  geom_point(mapping = aes(x = Age, y = Embarked))
+
+ggplot(data = titanic) + 
+  geom_point(mapping = aes(x = Age, y = Embarked, color = Survived))
+```
+
+###scatterplot (Sex ~ Age)
+```{r}
+ggplot(data = titanic) + 
+  geom_point(mapping = aes(x = Sex, y = Age))
+
+ggplot(data = titanic) + 
+  geom_point(mapping = aes(x = Sex, y = Age, color = Survived))
+
+ggplot(data = titanic) + 
+  geom_point(mapping = aes(x = PassengerId, y = Sex, color = Survived)) + 
+  facet_wrap( ~ Age )
+```
+
+###Density
+```{r}
+ggplot(data = titanic, aes(Age)) + 
+  geom_density(aes(fill=Survived,color=Survived), alpha=0.4)
+```
+
+###Histogram
+```{r}
+ggplot(data = titanic, aes(Age)) + 
+  geom_histogram(aes(color=Survived, fill=Survived), alpha=0.5)
+```
+
