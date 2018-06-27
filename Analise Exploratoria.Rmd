@@ -77,7 +77,7 @@ Qual a média de idade dos que morreram? e dos que sobreviveram?
 Alive <- group_by(titanic, Survived)
 summarise(Alive, Age = mean(Age, na.rm = TRUE))
 ```
-###Métricas básicas: 
+###Metricas basicas: 
 Six number summary
 
 ```{r}
@@ -97,13 +97,19 @@ ggplot(data = titanic, aes(x=Survived, y=Age)) +
   geom_boxplot(aes(color= Embarked))
 ```
 
-###scatterplot (Age ~Survived)
+
+Precebe-se a maior quantidade de pessoas entre 21 e 37 anos. Das mulheres, observa-se uma pequena diferença de idade entre as sobreviventes e as que faleceram. Entre os homens, a média de idades é a mesma, alterando apenas levemente a distribuição ao redor da média entre o primeiro e o terceiro quartil.
+
+####Curiosidade:
+O ultimo gráfico indica, dentre vivos e falecidos, qual a variação das idades separando os passageiros por seus portões de embarque.
+
+###Scatterplot (Age ~Survived)
 ```{r}
 ggplot(data = titanic) + 
   geom_point(mapping = aes(x = Age, y = Survived))
 ```
 
-###scatterplot (Age ~Embarked)
+###Scatterplot (Age ~Embarked)
 ```{r}
 ggplot(data = titanic) + 
   geom_point(mapping = aes(x = Age, y = Embarked))
@@ -112,7 +118,7 @@ ggplot(data = titanic) +
   geom_point(mapping = aes(x = Age, y = Embarked, color = Survived))
 ```
 
-###scatterplot (Sex ~ Age)
+###Scatterplot (Sex ~ Age)
 ```{r}
 ggplot(data = titanic) + 
   geom_point(mapping = aes(x = Sex, y = Age))
@@ -124,6 +130,8 @@ ggplot(data = titanic) +
   geom_point(mapping = aes(x = PassengerId, y = Sex, color = Survived)) + 
   facet_wrap( ~ Age )
 ```
+
+Maior quantidade de mulheres sobreviventes.
 
 ###Density
 ```{r}
