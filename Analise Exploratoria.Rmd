@@ -11,7 +11,7 @@ library(rpart)
 library(Amelia)
 ```
 
-Para inciar a análise, retiraram-se os dados do repositório no GitHub:
+Para inciar a análise, retiraramos os dados do repositório no GitHub:
 
 ```{r}
 titanic <- read.csv(("https://raw.githubusercontent.com/Efsilvaa/EPSMLRepo/master/Data/titanic.csv"),
@@ -26,12 +26,12 @@ A intenção inicial é ocupar os dados ausentes de colunas relevantes com infor
 missmap(titanic, main = "Missing values vs observed")
 ```
 
-
-Primeiramente, alterou-se a coluna Survived para fator, para facilitar a avaliação das informações contidas nessa variável:
+Primeiramente, alteramos a coluna "Survived" para fator, para facilitar a avaliação das informações contidas nessa variável:
 ```{r}
 titanic$Survived <- as.factor(titanic$Survived)
 summary(titanic$Survived)
 ```
+
 Depois, a coluna Embarked também foi transformada e seus espaços desconhecidos preenchidos com "S". Foi decidido por tomar essa decisão, pois eram pouquíssimos valores ausentes e "S" o fator mais comum na avaliação.
 ```{r}
 titanic$Embarked <- as.factor(titanic$Embarked)
@@ -39,11 +39,13 @@ titanic$Embarked[is.na(titanic$Embarked)] = "S"
 titanic$Embarked <- factor(titanic$Embarked)
 summary(titanic$Embarked)
 ```
+
 Sexo tmabém apresenta-se como uma variável categorica, entretanto é classificada no resumo dos dados como caracter.
 ```{r}
 titanic$Sex <- as.factor(titanic$Sex)
 contrasts(titanic$Sex)
 ```
+
 Após a aula de random forest, os dados ausentes referentes à idade foram preenchidos com uma previsão, que pode ser vista a seguir:
 ```{r}
 Agefit <- rpart(Age ~ Pclass + Sex + SibSp +
